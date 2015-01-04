@@ -3,6 +3,7 @@
 var P = require('bluebird');
 var R = require('superagent');
 require('superagent-bluebird-promise');
+var qs = require('qs');
 
 var BASE = 'http://www.skyscanner.com/dataservices/';
 var BROWSE = BASE + 'browse/v1.1/';
@@ -34,7 +35,11 @@ Skyscanner.prototype.destinations = function(from, to, opts) {
     'destinations',
     from, to, departureDate, returnDate
   ].join('/');
-  var url = this.getBase() + predicate + '/?includequotedate=true';
+  var queryParams = {
+    includequotedate: true,
+    sorttype: opts.sortType
+  };
+  var url = this.getBase() + predicate + '/?' + qs.stringify(queryParams);
   return new P(function(resolve, reject) {
     return R.get(url).promise().then(function(res) {
       return resolve(res.body);
